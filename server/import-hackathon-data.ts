@@ -6,7 +6,7 @@ async function importHackathonData() {
   
   try {
     const excelService = new HackathonExcelService();
-    const filePath = path.join(process.cwd(), '..', 'attached_assets', 'Hackathon_Data_without_CID_1751889519635.xlsx');
+    const filePath = path.join(process.cwd(), '..', 'attached_assets', 'Persona_1751889961813.xlsx');
     
     console.log(`Reading Excel file: ${filePath}`);
     await excelService.importHackathonData(filePath);

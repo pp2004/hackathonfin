@@ -36,7 +36,7 @@ export class HackathonExcelService {
   }
 
   private async importClientPortfolios(workbook: XLSX.WorkBook): Promise<void> {
-    const portfoliosSheet = workbook.Sheets['Persona Portfolios'];
+    const portfoliosSheet = workbook.Sheets['Sheet1'] || workbook.Sheets['Persona Portfolios'];
     const data = XLSX.utils.sheet_to_json(portfoliosSheet, { header: 1 }) as any[][];
     
     // Skip header row

@@ -99,23 +99,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { clientId, message } = z.object({
-        clientId: z.number(),
+        clientId: z.string(),
         message: z.string()
       }).parse(req.body);
 
-      const client = await storage.getClient(clientId);
+      const client = await storage.getClientByClientId(clientId);
       if (!client) {
         return res.status(404).json({ error: "Client not found" });
       }
 
-      const portfolio = await storage.getPortfolioByClientId(clientId);
+      const portfolio = await storage.getPortfolioByClientId(client.id);
       const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
 
-      const response = await openAIService.getChatResponse(message, client, portfolio, assetAllocations);
+      // Temporarily provide a static response while configuring Azure OpenAI deployment
+      const response = `Thank you for your question: "${message}". 
+
+I can see your portfolio information:
+- Client ID: ${client.clientId}
+- Name: ${client.name}
+- Risk Tolerance: ${client.riskTolerance}
+- Investment Horizon: ${client.investmentHorizon} years
+${portfolio ? `- Portfolio Value: $${portfolio.totalValue}
+- YTD Return: ${portfolio.ytdReturn}%
+- Volatility: ${portfolio.volatility}%` : ''}
+${assetAllocations.length > 0 ? `- Asset Allocations: ${assetAllocations.map(a => `${a.assetType} (${a.allocation}%)`).join(', ')}` : ''}
+
+The AI assistant is being configured with your Azure OpenAI deployment. Please verify the correct deployment name in your Azure OpenAI resource.`;
 
       // Save chat message
       await storage.createChatMessage({
-        clientId,
+        clientId: client.id,
         message,
         response
       });

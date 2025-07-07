@@ -9,7 +9,7 @@ export class OpenAIService {
     const azureApiKey = "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx";
     const azureEndpoint = "https://openaibuisnesshackathon.openai.azure.com/";
     const azureApiVersion = "2024-02-15-preview";
-    const deploymentName = "gpt-4";
+    const deploymentName = "gpt-35-turbo";
 
     this.openai = new OpenAI({
       apiKey: azureApiKey,
