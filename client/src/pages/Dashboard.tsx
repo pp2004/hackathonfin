@@ -9,6 +9,7 @@ import { ClientProfile } from "@/components/dashboard/ClientProfile";
 import { MarketInsights } from "@/components/dashboard/MarketInsights";
 import { ChatInterface } from "@/components/dashboard/ChatInterface";
 import { LoadingOverlay } from "@/components/dashboard/LoadingOverlay";
+import { RebalancingRecommendations } from "@/components/dashboard/RebalancingRecommendations";
 import { useClientData, useClients } from "@/hooks/use-client-data";
 import { Button } from "@/components/ui/button";
 import { ChartLine, Download, Calendar } from "lucide-react";
@@ -112,6 +113,13 @@ export default function Dashboard() {
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Rebalancing Recommendations */}
+        <div className="mt-8">
+          <RebalancingRecommendations 
+            clientData={clientData || null} 
+          />
         </div>
 
         {/* Chat Interface */}
