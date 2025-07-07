@@ -32,7 +32,7 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
                 className="flex items-center"
               >
                 <img 
-                  src="@assets/ubs_logo_1751886734052.png" 
+                  src="@assets/ubs-logo.png" 
                   alt="UBS Logo" 
                   className="h-8 w-auto"
                 />
