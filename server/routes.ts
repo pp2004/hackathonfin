@@ -264,6 +264,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Text and target language are required" });
       }
 
+      // Return original text for English
+      if (targetLanguage === 'en') {
+        return res.json({ translatedText: text });
+      }
+
       const translatedText = await translatorService.translateText({
         text,
         to: targetLanguage,
@@ -273,7 +278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ translatedText });
     } catch (error) {
       console.error("Error translating text:", error);
-      res.status(500).json({ error: "Failed to translate text" });
+      // Return original text as fallback
+      res.json({ translatedText: text });
     }
   });
 

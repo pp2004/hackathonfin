@@ -1,19 +1,19 @@
 import { useTheme } from "@/hooks/use-theme";
-import { useTranslation } from "@/lib/i18n";
+import { useTranslation } from "@/hooks/use-translation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HeaderProps {
   selectedClient: string | null;
-  onClientChange: (clientId: string) => void;
+  setSelectedClient: (clientId: string | null) => void;
   clients: Array<{ id: number; clientId: string; name: string }>;
 }
 
-export function Header({ selectedClient, onClientChange, clients }: HeaderProps) {
+export function Header({ selectedClient, setSelectedClient, clients }: HeaderProps) {
   const { theme, setTheme } = useTheme();
-  const { currentLanguage, changeLanguage, t, languages } = useTranslation();
+  const { language, setLanguage, t, isLoading } = useTranslation();
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -61,47 +61,48 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
               onClick={() => scrollToSection('dashboard')}
               className="text-gray-900 dark:text-white hover:text-[var(--ubs-red)] transition-colors duration-200"
             >
-              Dashboard
+              {t('nav.overview', 'Dashboard')}
             </button>
             <button 
               onClick={() => scrollToSection('portfolio')}
               className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
             >
-              Portfolio
+              {t('nav.portfolio', 'Portfolio')}
             </button>
             <button 
               onClick={() => scrollToSection('insights')}
               className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
             >
-              Insights
+              {t('nav.insights', 'Insights')}
             </button>
             <button 
               onClick={() => scrollToSection('transactions')}
               className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
             >
-              Transactions
+              {t('nav.transactions', 'Transactions')}
             </button>
             <button 
               onClick={() => scrollToSection('chat')}
               className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
             >
-              Chat
+              {t('nav.chat', 'Chat')}
             </button>
           </nav>
 
           {/* Controls */}
           <div className="flex items-center space-x-4">
             {/* Language Selector */}
-            <Select value={currentLanguage} onValueChange={changeLanguage}>
-              <SelectTrigger className="w-20">
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-24">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code}>
-                    {lang.flag} {lang.code.toUpperCase()}
-                  </SelectItem>
-                ))}
+                <SelectItem value="en">🇺🇸 EN</SelectItem>
+                <SelectItem value="zh">🇨🇳 ZH</SelectItem>
+                <SelectItem value="ja">🇯🇵 JA</SelectItem>
+                <SelectItem value="fr">🇫🇷 FR</SelectItem>
+                <SelectItem value="de">🇩🇪 DE</SelectItem>
+                <SelectItem value="es">🇪🇸 ES</SelectItem>
               </SelectContent>
             </Select>
 
@@ -120,9 +121,9 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
             </Button>
 
             {/* Client Selector */}
-            <Select value={selectedClient || ""} onValueChange={onClientChange}>
+            <Select value={selectedClient || ""} onValueChange={setSelectedClient}>
               <SelectTrigger className="w-48 bg-[var(--ubs-red)] text-white border-[var(--ubs-red)] hover:bg-[var(--ubs-red-dark)]">
-                <SelectValue placeholder={t('select_client')} />
+                <SelectValue placeholder={t('client.select', 'Select Client ID')} />
               </SelectTrigger>
               <SelectContent>
                 {clients.map((client) => (

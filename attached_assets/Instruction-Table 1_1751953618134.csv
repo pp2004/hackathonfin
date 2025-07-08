@@ -1,0 +1,95 @@
+Persona Porfolios,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"A set of 47 client portfolios has been provided for the Hackathon. These represent two types of investor personas: Reactive and Established.
+
+What You’ll Find in This Tab
+For each portfolio, you’ll see key information:
+•	Client Persona: The investor type assigned to the client. Use this to tailor your messaging—approaches should differ for “Reactive” vs. “Established” investors.
+•	Portfolio Volatility: The current risk level of the client’s portfolio. Higher volatility means higher investment risk.
+•	SAA Portfolio Volatility: The risk level if the client followed the CIO’s model portfolio for their risk tolerance. For example, a D (Balanced) risk profile in the CIO model might be 33% bonds, 50% equities, 12% alternatives, and 5% liquidity, with an expected volatility of 9.5%.
+•	Number of Positions: The number of different investments in the client’s portfolio as of June 2025.
+
+Persona Descriptions
+•	Reactive Investor: Tends to react emotionally or anxiously to market downturns.
+•	Established Investor: Follows a disciplined, structured investment strategy.
+
+Risk Tolerance for the Hackathon
+For simplicity, only two risk tolerance levels are included:
+•	D (Balanced)
+•	F (Equities)
+________________________________________
+Tip: Use the persona and risk data to personalize your solution or messaging for each client scenario.
+",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Positions ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"This tab shows each client’s portfolio holdings as of November 2024 and April 2025. By comparing these two dates, you can see:
+- Market movements affecting the value of investments
+- Trades made by the client
+- Transfers of investments in or out of the portfolio
+
+Position Types
+Each portfolio includes two types of positions (see the “Position Type” column):
+- Cash: Represented as “Cash”
+- Investments: Represented as “SEC” (securities such as stocks, bonds, etc.)
+Example:
+In line 2, portfolio A2JBHDVRR2FK5VWA holds a stock position in Raffles Education (valor: 12438228), valued at SGD 82,443.
+
+Tip:
+Use the changes between November 2024 and April 2025 to analyze client activity and market impact on their portfolio.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Transactions,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"This tab lists all trades made in the sample client portfolios from November 2024 to April 2025. Use this data to analyze each client’s investment behavior—these insights can help you tailor your messaging and engagement based on their Investor Profile and portfolio activity.
+
+What You’ll Find in This Tab
+For each transaction, you’ll see:
+- Trade Date: When the client placed the trade.
+- Buy/Sell: Whether the client bought or sold the product.
+- Solicitation: Indicates if the trade was advised by a Client Advisor (CA) or was self-executed by the client.
+- VALOR / ISIN: The unique identifier of the instrument traded.
+- Notional Amount (Currency & Value): The size of the trade in both currency and amount.
+- Long Name: The full name of the instrument traded.
+
+Tip:
+Use these transaction details to identify patterns in client behavior and personalize your approach for each client scenario.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Instrument Details ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Refer to this tab, if you would like to know more details about the instruments that are in the client's portfolio (in ""Positions"" tab) or traded by the client (in ""Transactions"" tab).
+This can be done by matching ISIN or VALOR in these tabs against those in ""Instrument Details"" tab.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"ISIN is a unique code that identifies a specific security (such as stocks, bonds, options, and futures) internationally.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+The Valor number is a unique identifier used primarily in Switzerland to identify securities.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Other specific columns in this tab are:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column E:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PMC = Precious Metals (Commodity) ; HF&PM = Hedge Funds and Private Markets (Alternative Investments) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column F:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Pooled Vehicles (Funds)  vs Direct investments (Single Securities like Bonds or Equities) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Tab: IP Values,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"This tab provides a snapshop of the client's Investor Profile across 4 specific points in time. (5/5/25, 3/5/24, 5/11/24, 1/5/23)
+
+This would give you insights into the client's investment objective (risk tolerance, investment horizon, knowledge and experience). This input would determine the relevant CIO investment strategy to compare against.
+
+Having a view across different points in time would also give you the understanding how clients have adjusted their IP over time.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Other specific columns in this tab are:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column E: ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Mandate Type:
+Advisory: Client directed general account; 
+Advisory Mandate: Client has access to institutional share class and his recommendations and portfolio health checks follow a mandate strategy.; 
+Investment Mandate: Client has a discretionary mandate which is managed by the Bank, the client does not give any trade instructions.  ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column F:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+" If the IP status shows incomplete the IP was invalid, the client was not able to trade. ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column G to AD:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Product Categories in which the client either has knowledge or experience.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Column AH:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Last Review Date: Date when the IP was last reviewed either with or without change. ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
