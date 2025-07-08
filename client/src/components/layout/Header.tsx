@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
+import ubs_logo from "@assets/ubs_logo.jpg";
+
 interface HeaderProps {
   selectedClient: string | null;
   setSelectedClient: (clientId: string | null) => void;
@@ -39,7 +41,7 @@ export function Header({ selectedClient, setSelectedClient, clients }: HeaderPro
                 className="flex items-center"
               >
                 <img 
-                  src="@assets/ubs-logo.png" 
+                  src={ubs_logo} 
                   alt="UBS Logo" 
                   className="h-8 w-auto"
                 />
