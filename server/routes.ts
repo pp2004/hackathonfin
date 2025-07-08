@@ -99,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { clientId, message } = z.object({
-        clientId: z.string(),
+        clientId: z.union([z.string(), z.number()]).transform(val => String(val)),
         message: z.string()
       }).parse(req.body);
 
@@ -111,26 +111,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const portfolio = await storage.getPortfolioByClientId(client.id);
       const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
 
-      // Temporarily provide a static response while configuring Azure OpenAI deployment
-      const response = `Thank you for your question: "${message}". 
-
-I can see your portfolio information:
-- Client ID: ${client.clientId}
-- Name: ${client.name}
-- Risk Tolerance: ${client.riskTolerance}
-- Investment Horizon: ${client.investmentHorizon} years
-${portfolio ? `- Portfolio Value: $${portfolio.totalValue}
-- YTD Return: ${portfolio.ytdReturn}%
-- Volatility: ${portfolio.volatility}%` : ''}
-${assetAllocations.length > 0 ? `- Asset Allocations: ${assetAllocations.map(a => `${a.assetType} (${a.allocation}%)`).join(', ')}` : ''}
-
-The AI assistant is being configured with your Azure OpenAI deployment. Please verify the correct deployment name in your Azure OpenAI resource.`;
+      // Use Azure OpenAI o3-mini for AI responses
+      const openaiService = new OpenAIService();
+      const response = await openaiService.getChatResponse(message, client, portfolio, assetAllocations);
 
       // Save chat message
       await storage.createChatMessage({
         clientId: client.id,
         message,
-        response
+        response,
+        timestamp: new Date()
       });
 
       res.json({ response });

@@ -5,11 +5,11 @@ export class OpenAIService {
   private openai: OpenAI;
 
   constructor() {
-    // Azure OpenAI configuration
+    // Azure OpenAI configuration with o3-mini model
     const azureApiKey = "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx";
     const azureEndpoint = "https://openaibuisnesshackathon.openai.azure.com/";
-    const azureApiVersion = "2024-02-15-preview";
-    const deploymentName = "gpt-35-turbo";
+    const azureApiVersion = "2025-01-01-preview";
+    const deploymentName = "o3-mini";
 
     this.openai = new OpenAI({
       apiKey: azureApiKey,
@@ -29,7 +29,7 @@ export class OpenAIService {
       const context = this.buildClientContext(client, portfolio, assetAllocations);
       
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4", // Azure OpenAI deployment model
+        model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
           {
             role: "system",
@@ -51,8 +51,8 @@ Guidelines:
             content: message
           }
         ],
-        max_tokens: 500,
-        temperature: 0.7
+        max_completion_tokens: 500
+        // Note: o3-mini model doesn't support temperature parameter
       });
 
       return response.choices[0].message.content || "I apologize, but I couldn't generate a response at this time.";
@@ -71,7 +71,7 @@ Guidelines:
       const context = this.buildClientContext(client, portfolio, assetAllocations);
       
       const response = await this.openai.chat.completions.create({
-        model: "gpt-4", // Azure OpenAI deployment model
+        model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
           {
             role: "system",
@@ -102,8 +102,8 @@ Provide your response in JSON format with the following structure:
           }
         ],
         response_format: { type: "json_object" },
-        max_tokens: 800,
-        temperature: 0.3
+        max_completion_tokens: 800
+        // Note: o3-mini model doesn't support temperature parameter
       });
 
       const result = JSON.parse(response.choices[0].message.content || "{}");
