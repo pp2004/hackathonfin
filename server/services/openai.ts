@@ -1,27 +1,37 @@
 import { AzureOpenAI } from "openai";
-import { Client, Portfolio, AssetAllocation, PortfolioPerformance } from "@shared/schema";
+import {
+  Client,
+  Portfolio,
+  AssetAllocation,
+  PortfolioPerformance,
+} from "@shared/schema";
 
 export class OpenAIService {
   private client: AzureOpenAI;
 
   constructor() {
     this.client = new AzureOpenAI({
-      apiKey: "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx",
+      apiKey:
+        "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx",
       endpoint: "https://openaibuisnesshackathon.openai.azure.com/",
       apiVersion: "2025-01-01-preview",
     });
   }
 
   async getChatResponse(
-    message: string, 
-    client: Client, 
-    portfolio: Portfolio | undefined, 
+    message: string,
+    client: Client,
+    portfolio: Portfolio | undefined,
     assetAllocations: AssetAllocation[],
-    performanceData: PortfolioPerformance[] = []
+    performanceData: PortfolioPerformance[] = [],
   ): Promise<string> {
     try {
-      const context = this.buildClientContext(client, portfolio, assetAllocations);
-      
+      const context = this.buildClientContext(
+        client,
+        portfolio,
+        assetAllocations,
+      );
+
       const response = await this.client.chat.completions.create({
         model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
@@ -41,25 +51,36 @@ Guidelines:
 - Explain complex financial concepts clearly
 - Suggest appropriate UBS products when relevant
 - Always consider the client's investment horizon and experience level
-- If asked about portfolio rebalancing, provide specific recommendations`
-              }
-            ]
+- If asked about portfolio rebalancing, provide specific recommendations`,
+              },
+            ],
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: message
-              }
-            ]
-          }
+                text: message,
+              },
+            ],
+          },
         ],
-        max_completion_tokens: 500
+        max_completion_tokens: 25000,
         // Note: o3-mini model doesn't support temperature parameter
       });
 
-      return response.choices[0].message.content || "I apologize, but I couldn't generate a response at this time.";
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        console.error("No content in response:", JSON.stringify(response, null, 2));
+        return "I apologize, but I couldn't generate a response at this time.";
+      }
+      
+      // Handle array format content from o3-mini
+      if (Array.isArray(content)) {
+        return content[0]?.text || "I apologize, but I couldn't generate a response at this time.";
+      }
+      
+      return content;
     } catch (error) {
       console.error("Error generating chat response:", error);
       throw new Error("Failed to generate AI response");
@@ -69,11 +90,15 @@ Guidelines:
   async getRebalancingRecommendations(
     client: Client,
     portfolio: Portfolio | undefined,
-    assetAllocations: AssetAllocation[]
+    assetAllocations: AssetAllocation[],
   ): Promise<any> {
     try {
-      const context = this.buildClientContext(client, portfolio, assetAllocations);
-      
+      const context = this.buildClientContext(
+        client,
+        portfolio,
+        assetAllocations,
+      );
+
       const response = await this.client.chat.completions.create({
         model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
@@ -101,51 +126,67 @@ Provide your response in JSON format with the following structure:
   "riskAssessment": "overall risk assessment",
   "expectedImpact": "expected impact on portfolio performance",
   "timeframe": "recommended implementation timeframe"
-}`
-              }
-            ]
+}`,
+              },
+            ],
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Please provide portfolio rebalancing recommendations for this client."
-              }
-            ]
-          }
+                text: "Please provide portfolio rebalancing recommendations for this client.",
+              },
+            ],
+          },
         ],
-        max_completion_tokens: 800
+        max_completion_tokens: 25000,
         // Note: o3-mini model doesn't support temperature parameter
       });
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
+        console.error("No rebalancing content in response:", JSON.stringify(response, null, 2));
         throw new Error("No response content received");
+      }
+      
+      // Handle array format content from o3-mini
+      let contentText = content;
+      if (Array.isArray(content)) {
+        contentText = content[0]?.text || "";
       }
 
       // Clean the response to ensure it's valid JSON
-      const cleanContent = content.trim().replace(/```json|```/g, '').trim();
-      
+      const cleanContent = contentText
+        .trim()
+        .replace(/```json|```/g, "")
+        .trim();
+
       try {
         const result = JSON.parse(cleanContent);
         return result;
       } catch (parseError) {
-        console.error("JSON parse error:", parseError, "Content:", cleanContent);
+        console.error(
+          "JSON parse error:",
+          parseError,
+          "Content:",
+          cleanContent,
+        );
         // Return a fallback response
         return {
           recommendations: [
             {
               action: "review",
-              assetClass: "Portfolio Review Required", 
+              assetClass: "Portfolio Review Required",
               currentAllocation: "0%",
               recommendedAllocation: "0%",
-              reasoning: "Unable to generate specific recommendations. Please consult with your advisor for personalized guidance."
-            }
+              reasoning:
+                "Unable to generate specific recommendations. Please consult with your advisor for personalized guidance.",
+            },
           ],
           riskAssessment: "Assessment pending",
           expectedImpact: "Manual review recommended",
-          timeframe: "Immediate consultation suggested"
+          timeframe: "Immediate consultation suggested",
         };
       }
     } catch (error) {
@@ -157,7 +198,7 @@ Provide your response in JSON format with the following structure:
   private buildClientContext(
     client: Client,
     portfolio: Portfolio | undefined,
-    assetAllocations: AssetAllocation[]
+    assetAllocations: AssetAllocation[],
   ): string {
     let context = `
 Client ID: ${client.clientId}
@@ -180,7 +221,7 @@ Portfolio Volatility: ${portfolio.volatility}%
       context += `
 Asset Allocation:
 `;
-      assetAllocations.forEach(allocation => {
+      assetAllocations.forEach((allocation) => {
         context += `- ${allocation.assetType}: ${allocation.allocation}% ($${allocation.value})
 `;
       });
