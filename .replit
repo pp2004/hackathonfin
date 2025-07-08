@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["glib", "xorg.libX11", "xorg.libXrandr", "alsa-lib", "pango", "atk", "cairo", "gtk3", "gdk-pixbuf"]
+packages = ["glib", "xorg.libX11", "xorg.libXrandr", "alsa-lib", "pango", "atk", "cairo", "gtk3", "gdk-pixbuf", "chromium"]
 
 [deployment]
 deploymentTarget = "autoscale"

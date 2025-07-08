@@ -1,21 +1,14 @@
-import OpenAI from "openai";
-import { Client, Portfolio, AssetAllocation } from "@shared/schema";
+import { AzureOpenAI } from "openai";
+import { Client, Portfolio, AssetAllocation, PortfolioPerformance } from "@shared/schema";
 
 export class OpenAIService {
-  private openai: OpenAI;
+  private client: AzureOpenAI;
 
   constructor() {
-    // Azure OpenAI configuration with o3-mini model
-    const azureApiKey = process.env.AZURE_OPENAI_KEY || "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx";
-    const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://openaibuisnesshackathon.openai.azure.com";
-    const azureApiVersion = process.env.AZURE_OPENAI_API_VERSION || "2025-01-01-preview";
-    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "o3-mini";
-
-    this.openai = new OpenAI({
-      apiKey: azureApiKey,
-      baseURL: `${azureEndpoint}/openai/deployments/${deploymentName}`,
-      defaultQuery: { 'api-version': azureApiVersion },
-      defaultHeaders: { 'api-key': azureApiKey },
+    this.client = new AzureOpenAI({
+      apiKey: "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx",
+      endpoint: "https://openaibuisnesshackathon.openai.azure.com/",
+      apiVersion: "2025-01-01-preview",
     });
   }
 
@@ -29,12 +22,15 @@ export class OpenAIService {
     try {
       const context = this.buildClientContext(client, portfolio, assetAllocations);
       
-      const response = await this.openai.chat.completions.create({
+      const response = await this.client.chat.completions.create({
         model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
           {
-            role: "system",
-            content: `You are an AI financial advisor assistant for UBS Wealth Management. You have access to the client's profile and portfolio data. Provide professional, accurate financial advice and analysis based on the client's specific situation. Always maintain a professional tone and provide actionable insights.
+            role: "developer",
+            content: [
+              {
+                type: "text",
+                text: `You are an AI financial advisor assistant for UBS Wealth Management. You have access to the client's profile and portfolio data. Provide professional, accurate financial advice and analysis based on the client's specific situation. Always maintain a professional tone and provide actionable insights.
 
 Client Context:
 ${context}
@@ -46,10 +42,17 @@ Guidelines:
 - Suggest appropriate UBS products when relevant
 - Always consider the client's investment horizon and experience level
 - If asked about portfolio rebalancing, provide specific recommendations`
+              }
+            ]
           },
           {
             role: "user",
-            content: message
+            content: [
+              {
+                type: "text",
+                text: message
+              }
+            ]
           }
         ],
         max_completion_tokens: 500
@@ -71,12 +74,15 @@ Guidelines:
     try {
       const context = this.buildClientContext(client, portfolio, assetAllocations);
       
-      const response = await this.openai.chat.completions.create({
+      const response = await this.client.chat.completions.create({
         model: "o3-mini", // Azure OpenAI o3-mini deployment
         messages: [
           {
-            role: "system",
-            content: `You are a portfolio rebalancing expert for UBS Wealth Management. Analyze the client's current portfolio allocation and provide specific rebalancing recommendations based on their risk tolerance, investment objectives, and current market conditions.
+            role: "developer",
+            content: [
+              {
+                type: "text",
+                text: `You are a portfolio rebalancing expert for UBS Wealth Management. Analyze the client's current portfolio allocation and provide specific rebalancing recommendations based on their risk tolerance, investment objectives, and current market conditions.
 
 Client Context:
 ${context}
@@ -96,13 +102,19 @@ Provide your response in JSON format with the following structure:
   "expectedImpact": "expected impact on portfolio performance",
   "timeframe": "recommended implementation timeframe"
 }`
+              }
+            ]
           },
           {
             role: "user",
-            content: "Please provide portfolio rebalancing recommendations for this client."
+            content: [
+              {
+                type: "text",
+                text: "Please provide portfolio rebalancing recommendations for this client."
+              }
+            ]
           }
         ],
-
         max_completion_tokens: 800
         // Note: o3-mini model doesn't support temperature parameter
       });

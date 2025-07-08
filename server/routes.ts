@@ -221,16 +221,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
       const performanceData = portfolio ? await storage.getPortfolioPerformance(portfolio.id, 12) : [];
 
-      const pdfBuffer = await pdfReportService.generatePDFReport(
-        client,
-        portfolio,
-        assetAllocations,
-        performanceData
-      );
-
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.pdf"`);
-      res.send(pdfBuffer);
+      // Return a JSON report for now
+      const reportData = {
+        client: client,
+        portfolio: portfolio,
+        assetAllocations: assetAllocations,
+        performanceData: performanceData,
+        generatedAt: new Date().toISOString()
+      };
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.json"`);
+      res.json(reportData);
     } catch (error) {
       console.error("Error generating report:", error);
       res.status(500).json({ error: "Failed to generate report" });
