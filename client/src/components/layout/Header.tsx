@@ -125,9 +125,9 @@ export function Header({ selectedClient, setSelectedClient, clients }: HeaderPro
               <SelectTrigger className="w-48 bg-[var(--ubs-red)] text-white border-[var(--ubs-red)] hover:bg-[var(--ubs-red-dark)]">
                 <SelectValue placeholder={t('client.select', 'Select Client ID')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px] overflow-y-auto">
                 {clients.map((client) => (
-                  <SelectItem key={client.clientId} value={client.clientId}>
+                  <SelectItem key={client.clientId} value={client.clientId} className="cursor-pointer">
                     {client.clientId} - {client.name}
                   </SelectItem>
                 ))}
