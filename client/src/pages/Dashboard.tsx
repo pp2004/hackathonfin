@@ -11,6 +11,10 @@ import { ChatInterface } from "@/components/dashboard/ChatInterface";
 import { LoadingOverlay } from "@/components/dashboard/LoadingOverlay";
 import { RebalancingRecommendations } from "@/components/dashboard/RebalancingRecommendations";
 import { Transactions } from "@/components/dashboard/Transactions";
+import { PortfolioMilestones } from "@/components/gamification/PortfolioMilestones";
+import { BudgetHealthTrafficLight } from "@/components/gamification/BudgetHealthTrafficLight";
+import { LearningModules } from "@/components/gamification/LearningModules";
+import { InvestmentJourney } from "@/components/gamification/InvestmentJourney";
 import { useClientData, useClients } from "@/hooks/use-client-data";
 import { Button } from "@/components/ui/button";
 import { ChartLine, Download, Calendar } from "lucide-react";
@@ -170,6 +174,28 @@ export default function Dashboard() {
           <RebalancingRecommendations 
             clientData={clientData || null} 
           />
+        </div>
+
+        {/* Gamification Features Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          <div id="milestones">
+            <PortfolioMilestones clientData={clientData || null} />
+          </div>
+          
+          <div id="health">
+            <BudgetHealthTrafficLight clientData={clientData || null} />
+          </div>
+        </div>
+
+        {/* Learning and Journey Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          <div id="learning">
+            <LearningModules clientData={clientData || null} />
+          </div>
+          
+          <div id="journey">
+            <InvestmentJourney clientData={clientData || null} />
+          </div>
         </div>
 
         {/* Transactions Section */}
