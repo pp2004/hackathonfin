@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { ClientData } from "@/hooks/use-client-data";
-import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { InvestmentInfoTooltip } from "@/components/ui/info-tooltip";
 
 interface WelcomeSectionProps {
   clientData: ClientData | null;
@@ -60,7 +60,7 @@ export function WelcomeSection({ clientData }: WelcomeSectionProps) {
             >
               <div className="flex items-center space-x-2">
                 <p className="text-sm text-red-100">{t('portfolio_value')}</p>
-                <InfoTooltip term="Portfolio Value" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
+                <InvestmentInfoTooltip term="Portfolio Value" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
               </div>
               <p className="text-2xl font-bold">
                 {clientData?.portfolio ? formatCurrency(clientData.portfolio.totalValue) : '--'}
@@ -76,7 +76,7 @@ export function WelcomeSection({ clientData }: WelcomeSectionProps) {
             >
               <div className="flex items-center space-x-2">
                 <p className="text-sm text-red-100">{t('ytd_return')}</p>
-                <InfoTooltip term="YTD Return" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
+                <InvestmentInfoTooltip term="YTD Return" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
               </div>
               <p className="text-2xl font-bold">
                 {clientData?.portfolio ? `${parseFloat(clientData.portfolio.ytdReturn).toFixed(1)}%` : '--'}
@@ -92,7 +92,7 @@ export function WelcomeSection({ clientData }: WelcomeSectionProps) {
             >
               <div className="flex items-center space-x-2">
                 <p className="text-sm text-red-100">{t('risk_level')}</p>
-                <InfoTooltip term="Risk Tolerance" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
+                <InvestmentInfoTooltip term="Risk Tolerance" className="h-3 w-3 text-red-200 hover:text-white cursor-pointer" />
               </div>
               <p className="text-2xl font-bold">
                 {clientData?.client?.riskTolerance || '--'}

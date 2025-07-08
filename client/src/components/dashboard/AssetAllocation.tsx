@@ -3,7 +3,7 @@ import { Doughnut } from "react-chartjs-2";
 import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { InvestmentInfoTooltip } from "@/components/ui/info-tooltip";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -59,7 +59,7 @@ export function AssetAllocation({ allocations }: AssetAllocationProps) {
         <CardHeader>
           <CardTitle className="text-xl font-semibold flex items-center space-x-2">
             <span>{t('asset_allocation')}</span>
-            <InfoTooltip term="Asset Allocation" />
+            <InvestmentInfoTooltip term="Asset Allocation" />
           </CardTitle>
         </CardHeader>
         <CardContent>

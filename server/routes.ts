@@ -5,12 +5,12 @@ import { insertClientSchema, insertChatMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { OpenAIService } from "./services/openai";
 import { ExcelService } from "./services/excel";
-import { ReportGeneratorService } from "./services/report-generator";
+import { HTMLReportService } from "./services/html-report";
 import multer from "multer";
 
 const upload = multer({ dest: 'uploads/' });
 const openAIService = new OpenAIService();
-const reportGenerator = new ReportGeneratorService();
+const htmlReportService = new HTMLReportService();
 const excelService = new ExcelService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -101,11 +101,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { clientId, message } = z.object({
-        clientId: z.union([z.string(), z.number()]).transform(val => String(val)),
+        clientId: z.union([z.string(), z.number()]).transform(val => 
+          typeof val === 'string' ? val : String(val)
+        ),
         message: z.string()
       }).parse(req.body);
 
-      const client = await storage.getClientByClientId(clientId);
+      // Try to find client by numeric ID first, then by clientId string
+      let client = null;
+      if (!isNaN(Number(clientId))) {
+        client = await storage.getClient(Number(clientId));
+      }
+      if (!client) {
+        client = await storage.getClientByClientId(clientId);
+      }
+      
       if (!client) {
         return res.status(404).json({ error: "Client not found" });
       }
@@ -195,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Download client report as PDF
+  // Download client report as HTML
   app.get("/api/clients/:clientId/report", async (req, res) => {
     try {
       const { clientId } = req.params;
@@ -209,16 +219,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
       const performanceData = portfolio ? await storage.getPortfolioPerformance(portfolio.id, 12) : [];
 
-      const pdfBuffer = await reportGenerator.generatePDFReport(
+      const htmlReport = htmlReportService.generateHTMLReport(
         client,
         portfolio,
         assetAllocations,
         performanceData
       );
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.pdf"`);
-      res.send(pdfBuffer);
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.html"`);
+      res.send(htmlReport);
     } catch (error) {
       console.error("Error generating report:", error);
       res.status(500).json({ error: "Failed to generate report" });
