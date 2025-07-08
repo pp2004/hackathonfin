@@ -1,8 +1,7 @@
 import { db } from './db';
 import { clients, portfolios, assetAllocations, portfolioPerformance } from '@shared/schema';
-import type { InsertClient, InsertPortfolio, InsertAssetAllocation, InsertPortfolioPerformance } from '@shared/schema';
 
-// 47 masked client IDs from the Persona CSV
+// All 47 masked client IDs from the Persona CSV
 const personaData = [
   { maskedId: 'A7GBHDVRRZ8Y774A', persona: 'Established Investor', riskTolerance: 'D', portfolioCcy: 'USD', numPositions: 30 },
   { maskedId: 'ATPBHDVRR2ACLMKA', persona: 'Established Investor', riskTolerance: 'D', portfolioCcy: 'USD', numPositions: 30 },
@@ -53,176 +52,98 @@ const personaData = [
   { maskedId: 'BHHBHDVR6LEEXFZA', persona: 'Reactive Investor', riskTolerance: 'F', portfolioCcy: 'USD', numPositions: 12 }
 ];
 
-async function seed47Clients() {
+async function seedSimple() {
   try {
-    console.log('Starting database seeding with 47 masked client IDs...');
-    
-    // Check if clients already exist
-    const existingClients = await db.select().from(clients);
-    console.log(`Found ${existingClients.length} existing clients`);
-    
-    if (existingClients.length >= 47) {
-      console.log('Database already has 47+ clients. Skipping seed.');
-      return;
-    }
-    
+    console.log('Starting simple seeding of 47 clients...');
+
     // Clear existing data
     await db.delete(portfolioPerformance);
     await db.delete(assetAllocations);
     await db.delete(portfolios);
     await db.delete(clients);
-    
+
     console.log('Cleared existing data');
-    
-    for (const data of personaData) {
-      // Create client record
-      const clientData: InsertClient = {
+
+    for (const [index, data] of personaData.entries()) {
+      console.log(`Creating client ${index + 1}/47: ${data.maskedId}`);
+      
+      // Create client - no timestamps, let defaults handle it
+      const [client] = await db.insert(clients).values({
         clientId: data.maskedId,
-        name: generateClientName(data.persona, data.maskedId),
-        riskTolerance: mapRiskTolerance(data.riskTolerance),
-        investmentHorizon: getInvestmentHorizon(data.persona),
+        name: `${data.persona.replace(' Investor', '')} Client ${data.maskedId.slice(-4)}`,
+        riskTolerance: data.riskTolerance === 'D' ? 'Balanced' : 'Aggressive',
+        investmentHorizon: data.persona === 'Reactive Investor' ? 3 : 7,
         investmentExperience: data.persona === 'Reactive Investor' ? 'Intermediate' : 'Advanced',
-        freeAssetRatio: calculateFreeAssetRatio(),
-        investmentObjective: getInvestmentObjective(data.riskTolerance, data.persona)
-      };
-      
-      const [client] = await db.insert(clients).values(clientData).returning();
-      
-      // Create portfolio record
-      const portfolioValue = calculatePortfolioValue(data.numPositions, data.portfolioCcy, data.riskTolerance);
-      const ytdReturn = generateYTDReturn();
-      
-      const portfolioData: InsertPortfolio = {
+        freeAssetRatio: '12.5',
+        investmentObjective: data.riskTolerance === 'F' ? 'Long-term growth' : 'Balanced growth and income'
+      }).returning();
+
+      // Create portfolio - no timestamps, let defaults handle it
+      const portfolioValue = data.numPositions * 50000;
+      const [portfolio] = await db.insert(portfolios).values({
         clientId: client.id,
         totalValue: portfolioValue.toString(),
-        ytdReturn: ytdReturn.toString(),
-        volatility: generateVolatility(data.riskTolerance).toString()
-      };
-      
-      const [portfolio] = await db.insert(portfolios).values(portfolioData).returning();
-      
-      // Generate asset allocations
-      const allocations = generateAssetAllocations(data.riskTolerance, portfolioValue);
+        ytdReturn: (Math.random() * 0.3 - 0.1).toFixed(4),
+        volatility: data.riskTolerance === 'F' ? '0.25' : '0.08'
+      }).returning();
+
+      // Create asset allocations
+      const allocations = data.riskTolerance === 'F' 
+        ? [
+            { assetType: 'Equities', allocation: '70', value: (portfolioValue * 0.7).toString() },
+            { assetType: 'Bonds', allocation: '15', value: (portfolioValue * 0.15).toString() },
+            { assetType: 'Alternatives', allocation: '10', value: (portfolioValue * 0.1).toString() },
+            { assetType: 'Cash', allocation: '5', value: (portfolioValue * 0.05).toString() }
+          ]
+        : [
+            { assetType: 'Equities', allocation: '50', value: (portfolioValue * 0.5).toString() },
+            { assetType: 'Bonds', allocation: '33', value: (portfolioValue * 0.33).toString() },
+            { assetType: 'Alternatives', allocation: '12', value: (portfolioValue * 0.12).toString() },
+            { assetType: 'Cash', allocation: '5', value: (portfolioValue * 0.05).toString() }
+          ];
+
       for (const allocation of allocations) {
-        const allocationData: InsertAssetAllocation = {
+        await db.insert(assetAllocations).values({
           portfolioId: portfolio.id,
           assetType: allocation.assetType,
-          allocation: allocation.allocation.toString(),
-          value: allocation.value.toString()
-        };
-        await db.insert(assetAllocations).values(allocationData);
+          allocation: allocation.allocation,
+          value: allocation.value
+        });
       }
+
+      // Create 12 months of performance data
+      const months = ['2024-01-01', '2024-02-01', '2024-03-01', '2024-04-01', '2024-05-01', '2024-06-01', 
+                     '2024-07-01', '2024-08-01', '2024-09-01', '2024-10-01', '2024-11-01', '2024-12-01'];
       
-      // Generate performance data
-      const performanceData = generatePortfolioPerformance(portfolioValue);
-      for (const performance of performanceData) {
-        const performanceRecord: InsertPortfolioPerformance = {
+      let currentValue = portfolioValue;
+      let benchmarkValue = portfolioValue;
+
+      for (const month of months) {
+        const monthlyReturn = (Math.random() - 0.5) * 0.06;
+        currentValue *= (1 + monthlyReturn);
+        
+        const benchmarkReturn = (Math.random() - 0.5) * 0.02;
+        benchmarkValue *= (1 + benchmarkReturn);
+
+        await db.insert(portfolioPerformance).values({
           portfolioId: portfolio.id,
-          date: performance.date,
-          value: performance.value.toString(),
-          benchmarkValue: performance.benchmarkValue.toString()
-        };
-        await db.insert(portfolioPerformance).values(performanceRecord);
+          date: month,
+          value: Math.round(currentValue).toString(),
+          benchmarkValue: Math.round(benchmarkValue).toString()
+        });
       }
-      
-      console.log(`Created client: ${client.clientId} - ${client.name}`);
     }
-    
-    console.log('Successfully seeded 47 clients with full portfolio data!');
+
+    console.log('Successfully seeded all 47 clients with complete data!');
   } catch (error) {
-    console.error('Error seeding clients:', error);
+    console.error('Error seeding:', error);
     throw error;
   }
 }
 
-function generateClientName(persona: string, maskedId: string): string {
-  const personaType = persona === 'Reactive Investor' ? 'Reactive' : 'Established';
-  const suffix = maskedId.slice(-4);
-  return `${personaType} Client ${suffix}`;
-}
-
-function mapRiskTolerance(riskCode: string): string {
-  return riskCode === 'D' ? 'Balanced' : 'Aggressive';
-}
-
-function getInvestmentHorizon(persona: string): number {
-  return persona === 'Reactive Investor' ? 3 : 7;
-}
-
-function getInvestmentObjective(riskTolerance: string, persona: string): string {
-  if (riskTolerance === 'F') {
-    return persona === 'Reactive Investor' ? 'Growth with volatility concerns' : 'Long-term growth';
-  }
-  return 'Balanced growth and income';
-}
-
-function calculateFreeAssetRatio(): string {
-  return (Math.random() * 15 + 5).toFixed(1);
-}
-
-function calculatePortfolioValue(numPositions: number, currency: string, riskTolerance: string): number {
-  const baseValue = numPositions * 50000;
-  const riskMultiplier = riskTolerance === 'F' ? 1.5 : 1.0;
-  const currencyMultiplier = currency === 'EUR' ? 0.9 : currency === 'SGD' ? 0.7 : 1.0;
-  
-  return Math.round(baseValue * riskMultiplier * currencyMultiplier);
-}
-
-function generateYTDReturn(): number {
-  return parseFloat((Math.random() * 0.3 - 0.1).toFixed(4)); // -10% to +20%
-}
-
-function generateVolatility(riskTolerance: string): number {
-  const baseVol = riskTolerance === 'F' ? 0.25 : 0.08;
-  return parseFloat((baseVol + (Math.random() - 0.5) * 0.05).toFixed(3));
-}
-
-function generateAssetAllocations(riskTolerance: string, totalValue: number) {
-  if (riskTolerance === 'F') {
-    return [
-      { assetType: 'Equities', allocation: 70, value: totalValue * 0.7 },
-      { assetType: 'Bonds', allocation: 15, value: totalValue * 0.15 },
-      { assetType: 'Alternatives', allocation: 10, value: totalValue * 0.1 },
-      { assetType: 'Cash', allocation: 5, value: totalValue * 0.05 }
-    ];
-  } else {
-    return [
-      { assetType: 'Equities', allocation: 50, value: totalValue * 0.5 },
-      { assetType: 'Bonds', allocation: 33, value: totalValue * 0.33 },
-      { assetType: 'Alternatives', allocation: 12, value: totalValue * 0.12 },
-      { assetType: 'Cash', allocation: 5, value: totalValue * 0.05 }
-    ];
-  }
-}
-
-function generatePortfolioPerformance(baseValue: number) {
-  const performance = [];
-  const months = ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', 
-                 '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12'];
-  
-  let currentValue = baseValue;
-  let benchmarkValue = baseValue;
-  
-  for (const month of months) {
-    const monthlyReturn = (Math.random() - 0.5) * 0.06; // -3% to +3% monthly
-    currentValue *= (1 + monthlyReturn);
-    
-    const benchmarkReturn = (Math.random() - 0.5) * 0.02; // -1% to +1% monthly
-    benchmarkValue *= (1 + benchmarkReturn);
-    
-    performance.push({
-      date: month + '-01',
-      value: Math.round(currentValue),
-      benchmarkValue: Math.round(benchmarkValue)
-    });
-  }
-  
-  return performance;
-}
-
-// Run seed if called directly
+// Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  seed47Clients()
+  seedSimple()
     .then(() => process.exit(0))
     .catch((error) => {
       console.error(error);
@@ -230,4 +151,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     });
 }
 
-export { seed47Clients };
+export { seedSimple };
