@@ -34,10 +34,55 @@ export default function Dashboard() {
   };
 
   const handleQuickAction = (action: string) => {
-    toast({
-      title: "Action Requested",
-      description: `${action} functionality will be implemented soon.`,
-    });
+    if (action === 'Download Report' && selectedClient) {
+      handleDownloadReport();
+    } else {
+      toast({
+        title: "Action Requested",
+        description: `${action} functionality will be implemented soon.`,
+      });
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    if (!selectedClient) {
+      toast({
+        title: "Error",
+        description: "Please select a client first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/clients/${selectedClient}/report`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate report');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `portfolio-report-${selectedClient}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Success",
+        description: "Portfolio report downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download report. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

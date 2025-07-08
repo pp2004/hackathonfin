@@ -5,10 +5,12 @@ import { insertClientSchema, insertChatMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { OpenAIService } from "./services/openai";
 import { ExcelService } from "./services/excel";
+import { ReportGeneratorService } from "./services/report-generator";
 import multer from "multer";
 
 const upload = multer({ dest: 'uploads/' });
 const openAIService = new OpenAIService();
+const reportGenerator = new ReportGeneratorService();
 const excelService = new ExcelService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -190,6 +192,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating rebalancing recommendations:", error);
       res.status(500).json({ error: "Failed to generate recommendations" });
+    }
+  });
+
+  // Download client report as PDF
+  app.get("/api/clients/:clientId/report", async (req, res) => {
+    try {
+      const { clientId } = req.params;
+      const client = await storage.getClientByClientId(clientId);
+      
+      if (!client) {
+        return res.status(404).json({ error: "Client not found" });
+      }
+
+      const portfolio = await storage.getPortfolioByClientId(client.id);
+      const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
+      const performanceData = portfolio ? await storage.getPortfolioPerformance(portfolio.id, 12) : [];
+
+      const pdfBuffer = await reportGenerator.generatePDFReport(
+        client,
+        portfolio,
+        assetAllocations,
+        performanceData
+      );
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Error generating report:", error);
+      res.status(500).json({ error: "Failed to generate report" });
     }
   });
 

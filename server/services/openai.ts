@@ -6,10 +6,10 @@ export class OpenAIService {
 
   constructor() {
     // Azure OpenAI configuration with o3-mini model
-    const azureApiKey = "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx";
-    const azureEndpoint = "https://openaibuisnesshackathon.openai.azure.com/";
-    const azureApiVersion = "2025-01-01-preview";
-    const deploymentName = "o3-mini";
+    const azureApiKey = process.env.AZURE_OPENAI_KEY || "4j8tLKCb6vbV0G3NpvNLDcMNrMQLkyQhsDYYkAIj5uRqmkroikjTJQQJ99BGACYeBjFXJ3w3AAABACOGtqPx";
+    const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://openaibuisnesshackathon.openai.azure.com";
+    const azureApiVersion = process.env.AZURE_OPENAI_API_VERSION || "2025-01-01-preview";
+    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT || "o3-mini";
 
     this.openai = new OpenAI({
       apiKey: azureApiKey,
