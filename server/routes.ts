@@ -5,12 +5,12 @@ import { insertClientSchema, insertChatMessageSchema } from "@shared/schema";
 import { z } from "zod";
 import { OpenAIService } from "./services/openai";
 import { ExcelService } from "./services/excel";
-import { HTMLReportService } from "./services/html-report";
+import { PDFReportService } from "./services/pdf-report";
 import multer from "multer";
 
 const upload = multer({ dest: 'uploads/' });
 const openAIService = new OpenAIService();
-const htmlReportService = new HTMLReportService();
+const pdfReportService = new PDFReportService();
 const excelService = new ExcelService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Download client report as HTML
+  // Download client report as PDF
   app.get("/api/clients/:clientId/report", async (req, res) => {
     try {
       const { clientId } = req.params;
@@ -219,16 +219,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assetAllocations = portfolio ? await storage.getAssetAllocationsByPortfolioId(portfolio.id) : [];
       const performanceData = portfolio ? await storage.getPortfolioPerformance(portfolio.id, 12) : [];
 
-      const htmlReport = htmlReportService.generateHTMLReport(
+      const pdfBuffer = await pdfReportService.generatePDFReport(
         client,
         portfolio,
         assetAllocations,
         performanceData
       );
 
-      res.setHeader('Content-Type', 'text/html');
-      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.html"`);
-      res.send(htmlReport);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="portfolio-report-${client.clientId}.pdf"`);
+      res.send(pdfBuffer);
     } catch (error) {
       console.error("Error generating report:", error);
       res.status(500).json({ error: "Failed to generate report" });

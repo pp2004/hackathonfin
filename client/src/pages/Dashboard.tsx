@@ -94,22 +94,26 @@ export default function Dashboard() {
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <WelcomeSection clientData={clientData || null} />
+        <div id="dashboard">
+          <WelcomeSection clientData={clientData || null} />
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Portfolio Overview */}
           <div className="lg:col-span-2 space-y-6">
-            <PortfolioChart 
-              performanceData={clientData?.performance || []} 
-            />
-            
-            <AssetAllocation 
-              allocations={clientData?.assetAllocations || []} 
-            />
-            
-            <RiskAnalysis 
-              clientData={clientData || null} 
-            />
+            <div id="portfolio">
+              <PortfolioChart 
+                performanceData={clientData?.performance || []} 
+              />
+              
+              <AssetAllocation 
+                allocations={clientData?.assetAllocations || []} 
+              />
+              
+              <RiskAnalysis 
+                clientData={clientData || null} 
+              />
+            </div>
           </div>
 
           {/* Right Column - Sidebar */}
@@ -161,14 +165,14 @@ export default function Dashboard() {
         </div>
 
         {/* Rebalancing Recommendations */}
-        <div className="mt-8">
+        <div id="insights" className="mt-8">
           <RebalancingRecommendations 
             clientData={clientData || null} 
           />
         </div>
 
         {/* Chat Interface */}
-        <div className="mt-8">
+        <div id="chat" className="mt-8">
           <ChatInterface 
             clientData={clientData || null} 
           />

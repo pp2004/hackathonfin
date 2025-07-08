@@ -101,13 +101,40 @@ Provide your response in JSON format with the following structure:
             content: "Please provide portfolio rebalancing recommendations for this client."
           }
         ],
-        response_format: { type: "json_object" },
+
         max_completion_tokens: 800
         // Note: o3-mini model doesn't support temperature parameter
       });
 
-      const result = JSON.parse(response.choices[0].message.content || "{}");
-      return result;
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error("No response content received");
+      }
+
+      // Clean the response to ensure it's valid JSON
+      const cleanContent = content.trim().replace(/```json|```/g, '').trim();
+      
+      try {
+        const result = JSON.parse(cleanContent);
+        return result;
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError, "Content:", cleanContent);
+        // Return a fallback response
+        return {
+          recommendations: [
+            {
+              action: "review",
+              assetClass: "Portfolio Review Required", 
+              currentAllocation: "0%",
+              recommendedAllocation: "0%",
+              reasoning: "Unable to generate specific recommendations. Please consult with your advisor for personalized guidance."
+            }
+          ],
+          riskAssessment: "Assessment pending",
+          expectedImpact: "Manual review recommended",
+          timeframe: "Immediate consultation suggested"
+        };
+      }
     } catch (error) {
       console.error("Error generating rebalancing recommendations:", error);
       throw new Error("Failed to generate rebalancing recommendations");

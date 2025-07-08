@@ -15,6 +15,13 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
   const { theme, setTheme } = useTheme();
   const { currentLanguage, changeLanguage, t, languages } = useTranslation();
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <motion.header 
       initial={{ y: -100, opacity: 0 }}
@@ -50,18 +57,30 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#dashboard" className="text-gray-900 dark:text-white hover:text-[var(--ubs-red)] transition-colors duration-200">
-              {t('dashboard')}
-            </a>
-            <a href="#portfolio" className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200">
-              {t('portfolio')}
-            </a>
-            <a href="#insights" className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200">
-              {t('insights')}
-            </a>
-            <a href="#chat" className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200">
-              {t('chat')}
-            </a>
+            <button 
+              onClick={() => scrollToSection('dashboard')}
+              className="text-gray-900 dark:text-white hover:text-[var(--ubs-red)] transition-colors duration-200"
+            >
+              Dashboard
+            </button>
+            <button 
+              onClick={() => scrollToSection('portfolio')}
+              className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
+            >
+              Portfolio
+            </button>
+            <button 
+              onClick={() => scrollToSection('insights')}
+              className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
+            >
+              Insights
+            </button>
+            <button 
+              onClick={() => scrollToSection('chat')}
+              className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
+            >
+              Chat
+            </button>
           </nav>
 
           {/* Controls */}
