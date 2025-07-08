@@ -76,6 +76,12 @@ export function Header({ selectedClient, onClientChange, clients }: HeaderProps)
               Insights
             </button>
             <button 
+              onClick={() => scrollToSection('transactions')}
+              className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
+            >
+              Transactions
+            </button>
+            <button 
               onClick={() => scrollToSection('chat')}
               className="text-gray-500 dark:text-gray-400 hover:text-[var(--ubs-red)] transition-colors duration-200"
             >

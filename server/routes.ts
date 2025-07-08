@@ -6,12 +6,14 @@ import { z } from "zod";
 import { OpenAIService } from "./services/openai";
 import { ExcelService } from "./services/excel";
 import { PDFReportService } from "./services/pdf-report";
+import { MicrosoftTranslatorService } from "./services/microsoft-translator";
 import multer from "multer";
 
 const upload = multer({ dest: 'uploads/' });
 const openAIService = new OpenAIService();
 const pdfReportService = new PDFReportService();
 const excelService = new ExcelService();
+const translatorService = new MicrosoftTranslatorService();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -232,6 +234,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating report:", error);
       res.status(500).json({ error: "Failed to generate report" });
+    }
+  });
+
+  // Get transactions for a client
+  app.get("/api/clients/:clientId/transactions", async (req, res) => {
+    try {
+      const { clientId } = req.params;
+      const { limit } = req.query;
+      
+      const transactions = await storage.getTransactionsByClientId(
+        clientId, 
+        limit ? parseInt(limit as string) : undefined
+      );
+      
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      res.status(500).json({ error: "Failed to fetch transactions" });
+    }
+  });
+
+  // Translation endpoint
+  app.post("/api/translate", async (req, res) => {
+    try {
+      const { text, targetLanguage, sourceLanguage = 'en' } = req.body;
+      
+      if (!text || !targetLanguage) {
+        return res.status(400).json({ error: "Text and target language are required" });
+      }
+
+      const translatedText = await translatorService.translateText({
+        text,
+        to: targetLanguage,
+        from: sourceLanguage
+      });
+
+      res.json({ translatedText });
+    } catch (error) {
+      console.error("Error translating text:", error);
+      res.status(500).json({ error: "Failed to translate text" });
     }
   });
 

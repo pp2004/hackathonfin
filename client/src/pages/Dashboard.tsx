@@ -10,6 +10,7 @@ import { MarketInsights } from "@/components/dashboard/MarketInsights";
 import { ChatInterface } from "@/components/dashboard/ChatInterface";
 import { LoadingOverlay } from "@/components/dashboard/LoadingOverlay";
 import { RebalancingRecommendations } from "@/components/dashboard/RebalancingRecommendations";
+import { Transactions } from "@/components/dashboard/Transactions";
 import { useClientData, useClients } from "@/hooks/use-client-data";
 import { Button } from "@/components/ui/button";
 import { ChartLine, Download, Calendar } from "lucide-react";
@@ -168,6 +169,13 @@ export default function Dashboard() {
         <div id="insights" className="mt-8">
           <RebalancingRecommendations 
             clientData={clientData || null} 
+          />
+        </div>
+
+        {/* Transactions Section */}
+        <div id="transactions" className="mt-8">
+          <Transactions 
+            clientId={selectedClient} 
           />
         </div>
 

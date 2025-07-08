@@ -23,7 +23,8 @@ export class OpenAIService {
     message: string, 
     client: Client, 
     portfolio: Portfolio | undefined, 
-    assetAllocations: AssetAllocation[]
+    assetAllocations: AssetAllocation[],
+    performanceData: PortfolioPerformance[] = []
   ): Promise<string> {
     try {
       const context = this.buildClientContext(client, portfolio, assetAllocations);

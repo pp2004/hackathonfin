@@ -66,10 +66,46 @@ export const investmentGlossary = pgTable("investment_glossary", {
   language: text("language").notNull().default("en"),
 });
 
+export const transactions = pgTable("transactions", {
+  id: serial("id").primaryKey(),
+  clientId: text("client_id").notNull(),
+  transactionDate: text("transaction_date").notNull(),
+  settlementDate: text("settlement_date"),
+  maturityDate: text("maturity_date"),
+  orderType: text("order_type"),
+  status: text("status"),
+  priceType: text("price_type"),
+  side: text("side"),
+  initiation: text("initiation"),
+  timeInForce: text("time_in_force"),
+  instrumentId: text("instrument_id"),
+  isin: text("isin"),
+  quantity: decimal("quantity", { precision: 20, scale: 6 }),
+  currency: text("currency"),
+  marketValue: decimal("market_value", { precision: 20, scale: 6 }),
+  nominalValue: decimal("nominal_value", { precision: 20, scale: 6 }),
+  price: decimal("price", { precision: 20, scale: 6 }),
+  interestRate: decimal("interest_rate", { precision: 10, scale: 6 }),
+  instrumentName: text("instrument_name"),
+  assetClass: text("asset_class"),
+  instrumentType: text("instrument_type"),
+  investmentCategory: text("investment_category"),
+  advisoryType: text("advisory_type"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Relations
 export const clientsRelations = relations(clients, ({ one, many }) => ({
   portfolio: one(portfolios),
   chatMessages: many(chatMessages),
+  transactions: many(transactions),
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  client: one(clients, {
+    fields: [transactions.clientId],
+    references: [clients.clientId],
+  }),
 }));
 
 export const portfoliosRelations = relations(portfolios, ({ one, many }) => ({
@@ -136,6 +172,11 @@ export const insertInvestmentGlossarySchema = createInsertSchema(investmentGloss
   id: true,
 });
 
+export const insertTransactionSchema = createInsertSchema(transactions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type Client = typeof clients.$inferSelect;
 export type InsertClient = z.infer<typeof insertClientSchema>;
@@ -151,3 +192,5 @@ export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type InvestmentGlossary = typeof investmentGlossary.$inferSelect;
 export type InsertInvestmentGlossary = z.infer<typeof insertInvestmentGlossarySchema>;
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;

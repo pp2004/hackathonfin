@@ -6,6 +6,7 @@ import {
   marketInsights, 
   chatMessages, 
   investmentGlossary,
+  transactions,
   type Client, 
   type InsertClient,
   type Portfolio,
@@ -19,7 +20,9 @@ import {
   type ChatMessage,
   type InsertChatMessage,
   type InvestmentGlossary,
-  type InsertInvestmentGlossary
+  type InsertInvestmentGlossary,
+  type Transaction,
+  type InsertTransaction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -57,6 +60,10 @@ export interface IStorage {
   getGlossaryTerms(language?: string): Promise<InvestmentGlossary[]>;
   getGlossaryTerm(term: string, language?: string): Promise<InvestmentGlossary | undefined>;
   createGlossaryTerm(term: InsertInvestmentGlossary): Promise<InvestmentGlossary>;
+  
+  // Transaction operations
+  getTransactionsByClientId(clientId: string, limit?: number): Promise<Transaction[]>;
+  createTransaction(transaction: InsertTransaction): Promise<Transaction>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -185,6 +192,20 @@ export class DatabaseStorage implements IStorage {
   async createGlossaryTerm(term: InsertInvestmentGlossary): Promise<InvestmentGlossary> {
     const [newTerm] = await db.insert(investmentGlossary).values(term).returning();
     return newTerm;
+  }
+
+  async getTransactionsByClientId(clientId: string, limit = 50): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.clientId, clientId))
+      .orderBy(desc(transactions.transactionDate))
+      .limit(limit);
+  }
+
+  async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
+    const [newTransaction] = await db.insert(transactions).values(transaction).returning();
+    return newTransaction;
   }
 }
 
